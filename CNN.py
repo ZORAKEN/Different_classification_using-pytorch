@@ -197,3 +197,28 @@ class CNN3Block(nn.Module):
 model = CNN3Block(num_classes=10)
 
 print(model)
+
+#verify
+
+model = CNN3Block(num_classes=10)
+
+x = torch.randn(32, 1, 28, 28)
+
+with torch.no_grad():
+    x1 = model.block1(x)
+    x2 = model.block2(x1)
+    x3 = model.block3(x2)
+    output = model.classifier(x3)
+
+print("Input:     ", x.shape)
+print("Block 1:   ", x1.shape)
+print("Block 2:   ", x2.shape)
+print("Block 3:   ", x3.shape)
+print("Output:    ", output.shape)
+
+print(
+    "Parameters:",
+    sum(p.numel() for p in model.parameters()
+        if p.requires_grad)
+)
+
