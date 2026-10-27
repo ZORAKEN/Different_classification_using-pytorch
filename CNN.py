@@ -120,3 +120,80 @@ with torch.no_grad():
 
 test_accuracy = 100 * correct / total
 print(f"Test accuracy: {test_accuracy:.2f}%")
+
+
+#implement a 3block cnn
+
+import torch
+import torch.nn as nn
+
+
+class CNN3Block(nn.Module):
+
+    def __init__(self, num_classes=10):
+        super().__init__()
+
+        # BLOCK 1: 1 -> 32 channels
+        self.block1 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=1,
+                out_channels=32,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        # BLOCK 2: 32 -> 64 channels
+        self.block2 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=32,
+                out_channels=64,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        # BLOCK 3: 64 -> 128 channels
+        self.block3 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=64,
+                out_channels=128,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        # CLASSIFIER
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(128 * 3 * 3, 256),
+            nn.ReLU(),
+            nn.Dropout(p=0.3),
+            nn.Linear(256, num_classes)
+        )
+
+    def forward(self, x):
+        x = self.block1(x)
+        x = self.block2(x)
+        x = self.block3(x)
+        x = self.classifier(x)
+
+        return x
+
+
+# Create the model
+model = CNN3Block(num_classes=10)
+
+print(model)
